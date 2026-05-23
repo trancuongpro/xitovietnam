@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Kéo Phé Việt Nam - Game Bài Tết</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title-glow">Xì Tố Việt Nam</h1>
+        </div>
+
+        <!-- Bàn chơi - đã kéo xuống -->
+        <div class="table-wrapper">
+            <div class="table-area">
+                <!-- Bot Tây (Trái) -->
+                <div class="player-card bot-west" id="botWest">
+                    <div class="player-name">🤖 Bot Tây</div>
+                    <div class="cards-area" id="westCards" style="display: none;">
+                        <div class="card back-card"></div>
+                        <div class="card back-card"></div>
+                        <div class="card back-card" style="display: none;"></div>
+                        <div class="card back-card" style="display: none;"></div>
+                        <div class="card back-card" style="display: none;"></div>
+                    </div>
+                    <div class="player-money" id="westMoney">1.000.000</div>
+                    <div class="player-bet" id="westBet">💰 0</div>
+                </div>
+
+                <!-- Bot Bắc (Trên) -->
+                <div class="player-card bot-north" id="botNorth">
+                    <div class="player-name">🤖 Bot Bắc</div>
+                    <div class="cards-area" id="northCards" style="display: none;">
+                        <div class="card back-card"></div>
+                        <div class="card back-card"></div>
+                        <div class="card back-card" style="display: none;"></div>
+                        <div class="card back-card" style="display: none;"></div>
+                        <div class="card back-card" style="display: none;"></div>
+                    </div>
+                    <div class="player-money" id="northMoney">1.000.000</div>
+                    <div class="player-bet" id="northBet">💰 0</div>
+                </div>
+
+                <!-- Bot Đông (Phải) -->
+                <div class="player-card bot-east" id="botEast">
+                    <div class="player-name">🤖 Bot Đông</div>
+                    <div class="cards-area" id="eastCards" style="display: none;">
+                        <div class="card back-card"></div>
+                        <div class="card back-card"></div>
+                        <div class="card back-card" style="display: none;"></div>
+                        <div class="card back-card" style="display: none;"></div>
+                        <div class="card back-card" style="display: none;"></div>
+                    </div>
+                    <div class="player-money" id="eastMoney">1.000.000</div>
+                    <div class="player-bet" id="eastBet">💰 0</div>
+                </div>
+
+                <!-- Người chơi Nam (Dưới) -->
+                <div class="player-card player-main" id="mainPlayer">
+                    <div class="player-name">👤 Tôi</div>
+                    <div class="cards-area" id="playerCards" style="display: none;">
+                        <div class="card back-card"></div>
+                        <div class="card back-card"></div>
+                        <div class="card back-card" style="display: none;"></div>
+                        <div class="card back-card" style="display: none;"></div>
+                        <div class="card back-card" style="display: none;"></div>
+                    </div>
+                    <div class="player-money" id="playerMoney">1.000.000</div>
+                    <div class="player-bet" id="playerBet">💰 0</div>
+                </div>
+
+                <!-- Lá bài trung tâm -->
+                <div class="center-deck" id="centerDeck">
+                    <div class="card back-card center-card"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Khu vực điều khiển - đã nhích xuống -->
+        <div class="controls-section">
+            <div class="controls">
+                <button class="btn btn-primary" id="dealBtn">🃏 Chia Bài</button>
+                
+                <div class="money-display">
+                    <img src="xito.png" alt="Phỉnh" class="chip-icon" onerror="this.style.display='none'">
+                    <span id="myMoneyDisplay">1.000.000</span>
+                    <span>Phỉnh</span>
+                </div>
+            </div>
+
+            <div class="betting-area">
+                <span class="bet-label">💰 Cược:</span>
+                <button class="btn-bet" id="minusBet">−</button>
+                <div class="bet-amount" id="betAmount">1.000</div>
+                <button class="btn-bet" id="plusBet">+</button>
+                <button class="btn btn-ok" id="confirmBetBtn">OK</button>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-follow" id="followBtn">✅ Theo</button>
+                <button class="btn btn-fold" id="foldBtn">❌ Bỏ</button>
+            </div>
+
+            <div class="sound-control">
+                <button class="btn-sound" id="soundToggle">🔊 Nhạc</button>
+                <button class="btn-guide" id="guideBtn">📖 Hướng Dẫn</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            🎴 Thiết Kế Trần Cường - Zalo: 0907860662 🎴
+        </div>
+    </div>
+
+    <!-- Thông báo -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Modal hướng dẫn -->
+    <div id="guideModal" class="modal">
+        <div class="modal-content">
+            <div id="guideContent"></div>
+            <button class="btn-close" onclick="closeGuide()">Đóng</button>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop src="nenxito.mp3"></audio>
+
+    <script src="labai.js"></script>
+    <script src="tinhtien.js"></script>
+    <script src="luatbai.js"></script>
+    <script src="thongbao.js"></script>
+    <script src="botxito.js"></script>
+    <script src="huongdan.js"></script>
+	<script src="nutxito.js"></script>
+    <script src="script.js"></script>
+	<script src="anti.js"></script>
+</body>
+</html>
