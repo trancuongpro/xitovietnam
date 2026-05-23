@@ -898,10 +898,10 @@ function determineNextBetter() {
 
         // DÙNG luatBai.js thật
         const compare =
-    luatBai.soSanhBaiMo(
-        openCards,
-        bestHand
-    );
+            luatBai.soSanh(
+                openCards,
+                bestHand
+            );
 
         if (compare > 0) {
 
