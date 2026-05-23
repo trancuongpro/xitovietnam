@@ -400,61 +400,174 @@ class LuatBai {
     }
 
     // =====================================
-    // SO SÁNH BÀI
-    // =====================================
+// SO SÁNH BÀI THẬT
+// =====================================
 
-    soSanh(hand1, hand2) {
+soSanh(hand1, hand2) {
 
-        const rank1 =
-            this.xepHangBai(hand1);
+    const rank1 =
+        this.xepHangBai(hand1);
 
-        const rank2 =
-            this.xepHangBai(hand2);
+    const rank2 =
+        this.xepHangBai(hand2);
 
-        // điểm tổng hợp
-        const total1 =
-            rank1.rank * 10000
-            +
-            rank1.value * 100
-            +
-            rank1.potential;
+    // =========================
+    // SO LOẠI BÀI
+    // =========================
 
-        const total2 =
-            rank2.rank * 10000
-            +
-            rank2.value * 100
-            +
-            rank2.potential;
+    if (rank1.rank !== rank2.rank) {
 
-        // so tổng
-        if (total1 !== total2) {
-
-            return total1 - total2;
-        }
-
-        // kicker
-        const sorted1 = hand1
-            .map(c =>
-                this.layGiaTriRank(c.rank)
-            )
-            .sort((a,b)=>b-a);
-
-        const sorted2 = hand2
-            .map(c =>
-                this.layGiaTriRank(c.rank)
-            )
-            .sort((a,b)=>b-a);
-
-        for (let i = 0; i < sorted1.length; i++) {
-
-            if (sorted1[i] !== sorted2[i]) {
-
-                return sorted1[i] - sorted2[i];
-            }
-        }
-
-        return 0;
+        return rank1.rank - rank2.rank;
     }
+
+    // =========================
+    // SO GIÁ TRỊ CHÍNH
+    // =========================
+
+    if (rank1.value !== rank2.value) {
+
+        return rank1.value - rank2.value;
+    }
+
+    // =========================
+    // SO KICKER
+    // =========================
+
+    const sorted1 = hand1
+        .map(c =>
+            this.layGiaTriRank(c.rank)
+        )
+        .sort((a,b)=>b-a);
+
+    const sorted2 = hand2
+        .map(c =>
+            this.layGiaTriRank(c.rank)
+        )
+        .sort((a,b)=>b-a);
+
+    for (let i = 0; i < sorted1.length; i++) {
+
+        if (sorted1[i] !== sorted2[i]) {
+
+            return sorted1[i] - sorted2[i];
+        }
+    }
+
+    return 0;
+}
+
+// =====================================
+// SO BÀI MỞ XÌ TỐ
+// CHỈ DÙNG ĐỂ XÁC ĐỊNH NGƯỜI CƯỢC
+// =====================================
+
+soSanhBaiMo(hand1, hand2) {
+
+    const ranks1 = hand1
+        .map(c => this.layGiaTriRank(c.rank))
+        .sort((a,b)=>b-a);
+
+    const ranks2 = hand2
+        .map(c => this.layGiaTriRank(c.rank))
+        .sort((a,b)=>b-a);
+
+    // =========================
+    // ĐẾM ĐÔI / SÁM
+    // =========================
+
+    const countRanks = (ranks) => {
+
+        const obj = {};
+
+        ranks.forEach(r => {
+
+            obj[r] = (obj[r] || 0) + 1;
+
+        });
+
+        return obj;
+    };
+
+    const c1 = countRanks(ranks1);
+    const c2 = countRanks(ranks2);
+
+    const getPower = (counts) => {
+
+        const values = Object.values(counts);
+
+        // xám
+        if (values.includes(3)) {
+
+            const triple =
+                parseInt(
+                    Object.keys(counts)
+                    .find(k => counts[k] === 3)
+                );
+
+            return {
+                type: 3,
+                value: triple
+            };
+        }
+
+        // đôi
+        if (values.includes(2)) {
+
+            const pair =
+                parseInt(
+                    Object.keys(counts)
+                    .find(k => counts[k] === 2)
+                );
+
+            return {
+                type: 2,
+                value: pair
+            };
+        }
+
+        // mậu thầu
+        return {
+            type: 1,
+            value: ranks1[0]
+        };
+    };
+
+    const p1 = getPower(c1);
+    const p2 = getPower(c2);
+
+    // =========================
+    // SO LOẠI BÀI
+    // =========================
+
+    if (p1.type !== p2.type) {
+
+        return p1.type - p2.type;
+    }
+
+    // =========================
+    // SO GIÁ TRỊ CHÍNH
+    // =========================
+
+    if (p1.value !== p2.value) {
+
+        return p1.value - p2.value;
+    }
+
+    // =========================
+    // SO KICKER
+    // =========================
+
+    for (let i = 0; i < ranks1.length; i++) {
+
+        if (ranks1[i] !== ranks2[i]) {
+
+            return ranks1[i] - ranks2[i];
+        }
+    }
+
+    return 0;
+}
+
 
     // =====================================
     // TÌM NGƯỜI THẮNG

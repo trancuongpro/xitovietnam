@@ -7,6 +7,7 @@ const huongDan = `
 <div style="line-height: 1.8;">
     <p><strong style="color: #ffd700;">1. Luật chơi cơ bản:</strong></p>
 	<p>- Mới Chơi Nhấn Chia bài để chơi, chú ý có chớp tới lượt rõ ràng , vui lòng nhìn bảng cụ thể để thao tác các nút</p>
+	<p>- Lá đầu tiên bạn là lá úp , nhưng mở ra chỉ mình bạn thấy , còn Bot không thấy.</p>
 	<p>- Nhìn Lượt Chớp Vàng Nếu Bài Lớn Được Cược Nút + - OK  , nút Theo hay Bỏ dành cho người được hỏi để theo hay bỏ bài.</p>
     <p>- Người chơi có 20 giây để Cược hoặc Theo hoặc Bỏ.</p>
 	<p>- Mỗi người chơi được chia 2 lá bài (1 úp, 1 mở).</p>

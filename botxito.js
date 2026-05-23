@@ -1,4 +1,4 @@
-// botxito.js - AI BOT XÌ TỐ THÔNG MINH
+// botxito.js - AI XÌ TỐ THÔNG MINH NHƯ POKER THẬT
 
 class BotXiTo {
 
@@ -12,14 +12,101 @@ class BotXiTo {
     // =========================
     // CẬP NHẬT BÀI
     // =========================
+
     capNhatBai(cards) {
 
         this.cards = [...cards];
     }
 
     // =========================
+    // ĐẾM RANK
+    // =========================
+
+    demRank(ranks) {
+
+        const counts = {};
+
+        ranks.forEach(v => {
+
+            counts[v] =
+                (counts[v] || 0) + 1;
+        });
+
+        return counts;
+    }
+
+    // =========================
+    // KIỂM TRA SẢNH TIỀM NĂNG
+    // =========================
+
+    kiemTraSanhTiemNang(ranks) {
+
+        const unique =
+            [...new Set(ranks)]
+            .sort((a,b)=>a-b);
+
+        let consecutive = 1;
+
+        for (let i = 1; i < unique.length; i++) {
+
+            const diff =
+                unique[i] -
+                unique[i - 1];
+
+            // liền nhau
+            if (diff === 1) {
+
+                consecutive++;
+
+                if (consecutive >= 3) {
+
+                    return true;
+                }
+            }
+
+            // cách 1 lá
+            else if (diff === 2) {
+
+                consecutive++;
+
+                if (consecutive >= 4) {
+
+                    return true;
+                }
+            }
+
+            else {
+
+                consecutive = 1;
+            }
+        }
+
+        return false;
+    }
+
+    // =========================
+    // KIỂM TRA THÙNG TIỀM NĂNG
+    // =========================
+
+    kiemTraThungTiemNang(suits) {
+
+        const suitCount = {};
+
+        suits.forEach(s => {
+
+            suitCount[s] =
+                (suitCount[s] || 0) + 1;
+        });
+
+        return Object
+            .values(suitCount)
+            .some(v => v >= 3);
+    }
+
+    // =========================
     // PHÂN TÍCH BÀI
     // =========================
+
     phanTichBai() {
 
         const ranks =
@@ -31,61 +118,35 @@ class BotXiTo {
             this.cards
             .map(c => c.suit);
 
-        const counts = {};
+        const counts =
+            this.demRank(ranks);
 
-        ranks.forEach(v => {
-
-            counts[v] =
-                (counts[v] || 0) + 1;
-        });
+        const values =
+            Object.values(counts);
 
         const pairCount =
-            Object.values(counts)
-            .filter(v => v >= 2)
+            values.filter(v => v >= 2)
             .length;
 
         const hasThree =
-            Object.values(counts)
-            .some(v => v >= 3);
+            values.some(v => v >= 3);
 
         const hasFour =
-            Object.values(counts)
-            .some(v => v >= 4);
+            values.some(v => v >= 4);
 
-        // =========================
-        // XÉT THÙNG
-        // =========================
-        const suitCount = {};
-
-        suits.forEach(s => {
-
-            suitCount[s] =
-                (suitCount[s] || 0) + 1;
-        });
+        const straightChance =
+            this.kiemTraSanhTiemNang(ranks);
 
         const flushChance =
-            Object.values(suitCount)
-            .some(v => v >= 3);
+            this.kiemTraThungTiemNang(suits);
+
+        const highest =
+            Math.max(...ranks);
 
         // =========================
-        // XÉT SẢNH
+        // ĐIỂM AI
         // =========================
-        let straightChance = false;
 
-        for (let i = 0; i < ranks.length - 1; i++) {
-
-            const diff =
-                ranks[i + 1] - ranks[i];
-
-            if (diff <= 2) {
-
-                straightChance = true;
-            }
-        }
-
-        // =========================
-        // ĐIỂM SỨC MẠNH
-        // =========================
         let strength = 0;
 
         // tứ quý
@@ -95,42 +156,39 @@ class BotXiTo {
         }
 
         // xám cô
-        if (hasThree) {
+        else if (hasThree) {
 
-            strength += 60;
+            strength += 75;
         }
 
         // 2 đôi
-        if (pairCount >= 2) {
+        else if (pairCount >= 2) {
 
-            strength += 45;
+            strength += 55;
         }
 
         // 1 đôi
-        if (pairCount === 1) {
+        else if (pairCount === 1) {
 
-            strength += 25;
+            strength += 30;
         }
 
-        // có khả năng sảnh
+        // tiềm năng sảnh
         if (straightChance) {
 
             strength += 18;
         }
 
-        // có khả năng thùng
+        // tiềm năng thùng
         if (flushChance) {
 
             strength += 15;
         }
 
         // lá lớn
-        const highest =
-            Math.max(...ranks);
+        if (highest >= 12) {
 
-        if (highest >= 11) {
-
-            strength += 10;
+            strength += 8;
         }
 
         return {
@@ -146,8 +204,9 @@ class BotXiTo {
     }
 
     // =========================
-    // QUYẾT ĐỊNH CƯỢC
+    // AI CƯỢC
     // =========================
+
     quyetDinhCuoc(
         money,
         minBet,
@@ -158,65 +217,102 @@ class BotXiTo {
         const info =
             this.phanTichBai();
 
-        // =========================
-        // BÀI CỰC MẠNH
-        // =========================
+        // =====================
+        // BÀI SIÊU MẠNH
+        // =====================
+
         if (
 
             info.hasFour ||
 
-            info.hasThree ||
-
-            info.pairCount >= 2
+            info.hasThree
 
         ) {
 
             return maxBet;
         }
 
-        // =========================
-        // KHÁ MẠNH
-        // =========================
+        // =====================
+        // HAI ĐÔI
+        // =====================
+
+        if (info.pairCount >= 2) {
+
+            return Math.floor(
+                maxBet * 0.85
+            );
+        }
+
+        // =====================
+        // ĐÔI + TIỀM NĂNG
+        // =====================
+
         if (
 
             info.pairCount === 1 &&
 
-            info.straightChance
+            (
+                info.straightChance ||
+                info.flushChance
+            )
 
         ) {
 
             return Math.floor(
-                maxBet * 0.8
+                maxBet * 0.75
             );
         }
 
-        // =========================
-        // CÓ TIỀM NĂNG
-        // =========================
+        // =====================
+        // ĐÔI THƯỜNG
+        // =====================
+
+        if (info.pairCount === 1) {
+
+            return Math.floor(
+                maxBet * 0.55
+            );
+        }
+
+        // =====================
+        // BÀI TIỀM NĂNG
+        // =====================
+
         if (
 
             info.straightChance ||
 
-            info.flushChance ||
-
-            info.highest >= 12
+            info.flushChance
 
         ) {
 
             return Math.floor(
-                maxBet * 0.5
+                maxBet * 0.45
             );
         }
 
-        // =========================
-        // BÀI YẾU
-        // =========================
+        // =====================
+        // CHỈ CÓ BÀI LỚN
+        // =====================
+
+        if (info.highest >= 13) {
+
+            return Math.floor(
+                maxBet * 0.3
+            );
+        }
+
+        // =====================
+        // RÁC
+        // =====================
+
         return minBet;
     }
 
     // =========================
-    // QUYẾT ĐỊNH THEO HAY BỎ
+    // AI THEO / BỎ
     // =========================
+
     quyetDinhTheo(
         currentBet,
         money,
@@ -229,62 +325,63 @@ class BotXiTo {
         const cardCount =
             this.cards.length;
 
-        // =========================
-        // 2 LÁ ĐẦU:
-        // KHÔNG BAO GIỜ BỎ
-        // =========================
+        // =====================
+        // 2 LÁ ĐẦU
+        // =====================
+
         if (cardCount <= 2) {
 
             return true;
         }
 
-        // =========================
-        // BÀI MẠNH
-        // =========================
+        // =====================
+        // TỨ QUÝ / XÁM
+        // =====================
+
         if (
 
             info.hasFour ||
 
-            info.hasThree ||
-
-            info.pairCount >= 2
+            info.hasThree
 
         ) {
 
             return true;
         }
 
-        // =========================
-        // CÓ TIỀM NĂNG
-        // =========================
+        // =====================
+        // HAI ĐÔI
+        // =====================
+
+        if (info.pairCount >= 2) {
+
+            return true;
+        }
+
+        // =====================
+        // ĐÔI + TIỀM NĂNG
+        // =====================
+
         if (
 
-            info.pairCount >= 1 ||
+            info.pairCount === 1 &&
 
-            info.straightChance ||
+            (
+                info.straightChance ||
 
-            info.flushChance
+                info.flushChance
+            )
 
         ) {
 
             return true;
         }
 
-        // =========================
-        // LÁ THỨ 3:
-        // bài chết thì bỏ
-        // ví dụ:
-        // 2 6 J
-        // =========================
-        if (cardCount === 3) {
+        // =====================
+        // 4 LÁ:
+        // chỉ theo nếu còn cửa
+        // =====================
 
-            return false;
-        }
-
-        // =========================
-        // LÁ THỨ 4:
-        // nếu còn hy vọng thì theo
-        // =========================
         if (cardCount === 4) {
 
             if (
@@ -303,16 +400,50 @@ class BotXiTo {
             return false;
         }
 
-        // =========================
-        // LÁ CUỐI
-        // =========================
+        // =====================
+        // 5 LÁ:
+        // bài rác bỏ luôn
+        // =====================
+
         if (cardCount >= 5) {
 
+            // có đôi mới theo
+            if (info.pairCount >= 1) {
+
+                return true;
+            }
+
+            // có khả năng thùng/sảnh
+            if (
+
+                info.straightChance ||
+
+                info.flushChance
+
+            ) {
+
+                return true;
+            }
+
+            return false;
+        }
+
+        // =====================
+        // 3 LÁ
+        // =====================
+
+        if (cardCount === 3) {
+
+            // có tiềm năng
             if (
 
                 info.pairCount >= 1 ||
 
-                info.hasThree
+                info.straightChance ||
+
+                info.flushChance ||
+
+                info.highest >= 13
 
             ) {
 
