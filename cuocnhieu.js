@@ -1,4 +1,4 @@
-// cuocnhieu.js - FILE DUY NHẤT TỰ ĐỘNG CHÈN STYLE, GIAO DIỆN VÀ THEO DÕI VÒNG CƯỢC
+// cuocnhieu.js - CHỈ GHI NHẬN TIỀN NGƯỜI PHÁT ĐỘNG CƯỢC ĐẦU MỖI VÒNG, HẾT TRẬN TẮT CHỮ
 (function () {
     // ==========================================
     // 1. TỰ ĐỘNG CHÈN STYLE CHỚP VÀNG GOLD 24K VÀO TRANG
@@ -17,7 +17,7 @@
                 margin-top: 8px;
                 text-shadow: 0 0 6px rgba(255, 215, 0, 0.6), 0 0 12px rgba(255, 140, 0, 0.4);
                 animation: lightBlink 2.5s infinite ease-in-out;
-                display: none; /* Mặc định ẩn, chỉ hiện khi có cược */
+                display: none; /* Mặc định ẩn */
                 width: 100%;
             }
             @keyframes lightBlink {
@@ -29,14 +29,14 @@
     }
 
     // ==========================================
-    // 2. LỚP QUẢN LÝ HIỂN THỊ TIỀN CƯỢC THEO VÒNG
+    // 2. LỚP QUẢN LÝ HIỂN THỊ TIỀN CƯỢC THEO YÊU CẦU
     // ==========================================
     class BoPhanCuocNhieu {
         constructor() {
             this.displayDiv = null;
         }
 
-        // Chuyển đổi chỉ số vòng (0, 1, 2, 3) sang tên gọi Tiếng Việt theo yêu cầu
+        // Chuyển đổi chỉ số vòng (0 -> Đầu, 1 -> 3, 2 -> 4, 3 -> Cuối)
         getTenVong(roundIndex) {
             switch (roundIndex) {
                 case 0: return "Đầu";
@@ -47,7 +47,7 @@
             }
         }
 
-        // Tạo phần tử HTML dưới dòng chữ "Xì Tố Việt Nam" nếu chưa có
+        // Tạo phần tử hiển thị nằm ngay dưới dòng "Xì Tố Việt Nam"
         taoElementHienThi() {
             if (this.displayDiv) return this.displayDiv;
 
@@ -57,7 +57,7 @@
                 this.displayDiv.id = 'dongChuCuocDisplay';
                 this.displayDiv.className = 'gold-bet-glow';
                 
-                // Tìm header chứa chữ "Xì Tố Việt Nam" để chèn vào ngay bên dưới
+                // Tìm header chứa chữ "Xì Tố Việt Nam" để chèn vào ngay dưới
                 const header = document.querySelector('.header');
                 if (header) {
                     header.appendChild(this.displayDiv);
@@ -66,9 +66,9 @@
             return this.displayDiv;
         }
 
-        // Ghi nhận và hiển thị chuỗi chữ tiền cược lên màn hình
+        // Ghi nhận và hiển thị chính xác số tiền cược đầu tiên của vòng
         hienThiTienCuoc(roundIndex, soTien) {
-            // Nếu ván đấu đã kết thúc hoặc chưa chơi thì không thông báo tiền cược
+            // Nếu game kết thúc hoặc chưa chơi thì dẹp thông báo luôn
             if (typeof gameState !== 'undefined' && (gameState.gameEnded || !gameState.isPlaying)) {
                 this.anThongBao();
                 return;
@@ -82,7 +82,7 @@
             }
         }
 
-        // Ẩn dòng chữ thông báo tiền cược khi kết thúc ván bài hoặc reset ván mới
+        // Ẩn dòng chữ thông báo tiền cược
         anThongBao() {
             const el = document.getElementById('dongChuCuocDisplay');
             if (el) {
@@ -94,49 +94,52 @@
     const troLyCuoc = new BoPhanCuocNhieu();
 
     // ==========================================
-    // 3. CAN THIỆP VÀO SỰ KIỆN CỦA GAME (HOOKS)
+    // 3. CAN THIỆP VÀO LOGIC CƯỢC ĐẦU VÒNG (HOOKS)
     // ==========================================
     function kiemTraVaTichHop() {
-        // A. Bắt sự kiện khi Người chơi bấm OK xác nhận cược thành công
+        
+        // A. Trường hợp NGƯỜI CHƠI lớn nhất và bấm OK để ra tiền cược phát động vòng
         if (typeof window.confirmBet === 'function' && !window.confirmBet.isHooked) {
             const originalConfirmBet = window.confirmBet;
             window.confirmBet = function () {
                 originalConfirmBet.apply(this, arguments);
-                // Sau khi chạy hàm gốc thành công, lấy dữ liệu từ gameState để hiển thị
-                if (typeof gameState !== 'undefined') {
+                if (typeof gameState !== 'undefined' && typeof currentBetAmount !== 'undefined') {
+                    // Hiển thị ngay số tiền người chơi vừa chọn cược đầu vòng
                     troLyCuoc.hienThiTienCuoc(gameState.currentRound, currentBetAmount);
                 }
             };
             window.confirmBet.isHooked = true;
         }
 
-        // B. Bắt sự kiện khi Bot ra quyết định đặt cược đầu vòng thành công
+        // B. Trường hợp một BOT bất kỳ lớn nhất vòng đứng ra phát động tiền cược
         if (typeof window.botPlaceBet === 'function' && !window.botPlaceBet.isHooked) {
             const originalBotPlaceBet = window.botPlaceBet;
             window.botPlaceBet = function (botId) {
                 originalBotPlaceBet.apply(this, arguments);
-                // Sau khi Bot cược, trích xuất số tiền cược hiện tại của vòng để hiển thị
                 if (typeof gameState !== 'undefined' && typeof tienGame !== 'undefined') {
-                    const cuocHienTai = tienGame.layCuocHienTai();
-                    if (cuocHienTai > 0) {
-                        troLyCuoc.hienThiTienCuoc(gameState.currentRound, cuocHienTai);
-                    }
+                    // Lấy số tiền cược hiện tại mà Bot vừa áp đặt cho vòng chơi này để hiển thị
+                    setTimeout(() => {
+                        const cuocHienTai = tienGame.layCuocHienTai();
+                        if (cuocHienTai > 0) {
+                            troLyCuoc.hienThiTienCuoc(gameState.currentRound, cuocHienTai);
+                        }
+                    }, 50); // Chờ một chút nhỏ để bảo đảm hàm gốc cập nhật xong tiền vào hệ thống
                 }
             };
             window.botPlaceBet.isHooked = true;
         }
 
-        // C. Bắt sự kiện Kết thúc trận bài (So bài tìm người thắng) để ẩn chữ đi ngay lập tức
+        // C. Hết trận bài (Xác định người thắng hoặc so bài): Tắt ngay chữ, dọn đợi ván mới
         if (typeof window.endGameAndCompare === 'function' && !window.endGameAndCompare.isHooked) {
             const originalEndGameAndCompare = window.endGameAndCompare;
             window.endGameAndCompare = function () {
-                troLyCuoc.anThongBao(); // Ẩn thông báo tiền cược ngay khi hết trận
+                troLyCuoc.anThongBao(); // Kết thúc ván tắt ngay chữ đợi trận mới
                 originalEndGameAndCompare.apply(this, arguments);
             };
             window.endGameAndCompare.isHooked = true;
         }
 
-        // D. Bắt sự kiện đặt lại game hoặc chuẩn bị ván mới để dọn sạch dòng chữ cũ
+        // D. Các hàm reset chuẩn bị hoặc bắt đầu ván mới: Đảm bảo xóa sạch thông báo cũ
         if (typeof window.resetGame === 'function' && !window.resetGame.isHooked) {
             const originalResetGame = window.resetGame;
             window.resetGame = function () {
@@ -156,11 +159,11 @@
         }
     }
 
-    // Tự động kiểm tra liên tục mỗi 300ms cho đến khi các file script của hệ thống tải xong hoàn toàn để gán logic vào
+    // Vòng lặp kiểm tra load file core game để kích hoạt liên kết hooks
     const intervalHook = setInterval(() => {
-        if (typeof gameState !== 'undefined' && typeof window.confirmBet === 'function') {
+        if (typeof gameState !== 'undefined' && typeof window.confirmBet === 'function' && typeof window.botPlaceBet === 'function') {
             kiemTraVaTichHop();
-            clearInterval(intervalHook); // Gán thành công thì dừng vòng lặp kiểm tra
+            clearInterval(intervalHook);
         }
-    }, 300);
+    }, 200);
 })();
