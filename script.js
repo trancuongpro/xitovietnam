@@ -127,13 +127,39 @@ function confirmBet() {
     tienGame.capNhatCuocHienTai(
         currentBetAmount
     );
+	
+	gameState.currentBetter = 'player';
 
     updateMoneyDisplay();
     updatePotDisplay();
 
     thongBao.hienThongBao(
-        `Bạn cược ${currentBetAmount.toLocaleString()} Phỉnh`
+    `Bạn cược ${currentBetAmount.toLocaleString()} Phỉnh`
+);
+
+// HIỆN DÒNG VÀNG CƯỢC
+const dongCuoc =
+    document.getElementById(
+        'dongChuCuocDisplay'
     );
+
+if (dongCuoc) {
+
+    const tenVong =
+        gameState.currentRound === 0
+        ? 'Đầu'
+        : gameState.currentRound === 1
+        ? '3'
+        : gameState.currentRound === 2
+        ? '4'
+        : 'Cuối';
+
+    dongCuoc.textContent =
+        `Vòng ${tenVong} Họ Cược : ${currentBetAmount.toLocaleString()} Phỉnh`;
+
+    dongCuoc.style.display =
+        'block';
+}
 
     disableAllButtons();
 
@@ -305,7 +331,7 @@ function nextFollowTurn() {
         ) {
 
             thongBao.hienThongBao(
-                "Chỉ còn 1 người chơi"
+                "Ồ Ai Cũng Bỏ Hết Vậy Ha Ha Ha Lụm Lúa Thôi Nè"
             );
 
             endGameAndCompare();
@@ -1135,11 +1161,11 @@ function updateMoneyDisplay() {
 function toggleSound() {
     if (isMusicPlaying) {
         bgMusic.pause();
-        soundToggle.textContent = '🔇 Nhạc';
+        soundToggle.textContent = '🔇 Tắt Nhạc';
         isMusicPlaying = false;
     } else {
         bgMusic.play();
-        soundToggle.textContent = '🔊 Nhạc';
+        soundToggle.textContent = '🔊 Nhạc Nền';
         isMusicPlaying = true;
         musicStarted = true;
     }

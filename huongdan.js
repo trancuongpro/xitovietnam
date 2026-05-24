@@ -1,6 +1,6 @@
 // Nội dung hướng dẫn
 const huongDan = `
-<div style="color: #ffd700; font-size: 24px; font-weight: bold; margin-bottom: 20px; text-align: center;">
+<div style="color: #ffd700; font-size: 32px; font-weight: bold; margin-bottom: 20px; text-align: center;">
     🎴 HƯỚNG DẪN CHƠI XÌ PHÉ 🎴
 </div>
 
