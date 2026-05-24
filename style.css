@@ -953,7 +953,7 @@ body{
 
 .card{
 
-    animation:dealCard .28s ease;
+    animation:none !important;
 }
 
 @keyframes dealCard{

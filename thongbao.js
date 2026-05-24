@@ -43,7 +43,7 @@ if (
     hienThongBaoThang(nguoiThang, soTien) {
         if (!this.notificationDiv) return;
         
-        let countdown = 15;
+        let countdown = 10;
 
 this.notificationDiv.innerHTML =
 `
@@ -102,7 +102,7 @@ setInterval(() => {
         '18px';
         setTimeout(() => {
             this.anThongBao();
-        }, 15000);
+        }, 10000);
     }
     
     hienThongBaoDo(message, callback) {
@@ -157,7 +157,7 @@ setInterval(() => {
                 self.anThongBao();
                 if (callback) callback();
             }
-        }, 15000);
+        }, 10000);
     }
     
     hienXacNhan(message, callback) {

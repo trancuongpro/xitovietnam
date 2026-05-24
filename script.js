@@ -382,7 +382,7 @@ function nextFollowTurn() {
 
     startCountdown();
 
-}, 1000);
+}, 2000);
     } else {
 
         // BOT
@@ -401,10 +401,10 @@ async function processSingleBotTurn(botId) {
     );
 
     // CHỜ 5 GIÂY ĐỌC THÔNG BÁO
-    await delay(5000);
+    await delay(3000);
 
-    // BẮT ĐẦU 20 GIÂY SUY NGHĨ
-    let remain = 20;
+    // BẮT ĐẦU 30 GIÂY SUY NGHĨ
+    let remain = 30;
 
     thongBao.hienThongBao(
         `${getBotName(botId)} (${remain}s)`
@@ -418,7 +418,7 @@ async function processSingleBotTurn(botId) {
             `${getBotName(botId)} (${remain}s)`
         );
 
-    }, 1000);
+    }, 3000);
 
     // BOT SUY NGHĨ
     await delay(
@@ -427,7 +427,7 @@ async function processSingleBotTurn(botId) {
 
     clearInterval(countdown);
 
-    // QUÁ 20S TỰ BỎ
+    // QUÁ 30S TỰ BỎ
     if (remain <= 0) {
 
         thongBao.hienThongBao(
@@ -501,7 +501,7 @@ async function processSingleBotTurn(botId) {
 
         nextFollowTurn();
 
-    }, 1000);
+    }, 3000);
 }
 
 
@@ -654,11 +654,16 @@ function determineFirstBetter() {
     betAmountSpan.textContent = "1.000";
 
     enableBetControls();
+	
 
-    startCountdown();
+    // Đợi 3 giây mới countdown
+    setTimeout(() => {
+        startCountdown();
+    }, 1500);
+	
 } else {
         thongBao.hienThongBao(`${getBotName(bestPlayer)} có bài lớn nhất và đang cược...`);
-        setTimeout(() => botPlaceBet(bestPlayer), 2200);
+        setTimeout(() => botPlaceBet(bestPlayer), 1500);
     }
 }
 
@@ -760,7 +765,7 @@ function clearCountdown() {
 function startCountdown() {
     if (gameState.hasFolded || gameState.gameEnded) return;
     clearCountdown();
-    let timeLeft = 20;
+    let timeLeft = 30;
     countdownInterval = setInterval(() => {
         if (gameState.hasFolded || gameState.gameEnded) {
             clearCountdown();
@@ -774,7 +779,7 @@ function startCountdown() {
         } else {
             thongBao.hienThongBao(`Còn ${timeLeft} giây...`);
         }
-    }, 1000);
+    }, 2000);
 }
 
 async function dealNextRound() {
@@ -860,7 +865,7 @@ await delay(300);
 
         determineNextBetter();
 
-    }, 1500);
+    }, 2000);
 }
 
 function determineNextBetter() {
@@ -944,13 +949,13 @@ setTimeout(() => {
         "Bạn Cược Bao Nhiêu?"
     );
 
-}, 1000);
+}, 2000);
 
             enableBetControls();
 
 startCountdown();
 
-        }, 1000);
+        }, 2000);
 
     } else {
 
@@ -964,9 +969,9 @@ startCountdown();
 
         botPlaceBet(bestPlayer);
 
-    }, 1000);
+    }, 3000);
 
-}, 1000);
+}, 3000);
     }
 }
 
@@ -1001,7 +1006,7 @@ function endGameAndCompare() {
         updateMoneyDisplay();
         updatePotDisplay();
 
-        setTimeout(resetGame, 15000);
+        setTimeout(resetGame, 10000);
     }, 1500);
 }
 

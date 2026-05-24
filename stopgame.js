@@ -4,6 +4,33 @@
     let previousActivePlayers = ['player', 'botWest', 'botNorth', 'botEast'];
     let wasPlayingBefore = false;
 
+    // Danh sách các ảnh thua có sẵn trong thư mục
+    const loseImages = ['thua.png', 'thua2.png', 'thua3.png'];
+
+    // Hàm lấy danh sách các ảnh chưa được sử dụng trên màn hình
+    function getAvailableImage() {
+        // Tìm tất cả các ảnh hiện đang hiển thị trên màn hình
+        const currentImages = Array.from(document.querySelectorAll('.stop-game-overlay .thua-img'))
+                                   .map(img => {
+                                       // Lấy tên file ở cuối đường dẫn src
+                                       const parts = img.src.split('/');
+                                       return parts[parts.length - 1];
+                                   });
+
+        // Lọc ra những ảnh chưa xuất hiện
+        const available = loseImages.filter(img => !currentImages.includes(img));
+
+        // Nếu còn ảnh chưa dùng thì bốc ngẫu nhiên một ảnh trong số đó
+        if (available.length > 0) {
+            const randomIndex = Math.floor(Math.random() * available.length);
+            return available[randomIndex];
+        }
+
+        // Trường hợp hiếm: Cả 3 ảnh đều đã dùng hết (ví dụ cả 4 người cùng thua), 
+        // thì chọn đại ngẫu nhiên 1 trong 3 ảnh ban đầu để tránh bị lỗi hiển thị.
+        return loseImages[Math.floor(Math.random() * loseImages.length)];
+    }
+
     // Hàm thực hiện đóng dấu tròn chéo STOP lên khu vực người chơi
     function appendStopOverlay(playerId) {
         let el = null;
@@ -16,11 +43,14 @@
             // Nếu đã có dấu stop/thua rồi thì không tạo trùng nữa
             if (el.querySelector('.stop-game-overlay')) return;
 
+            // Lấy một ảnh ngẫu nhiên chưa trùng với các vị trí thua trước đó
+            const selectedImage = getAvailableImage();
+
             const stopDiv = document.createElement('div');
             stopDiv.className = 'stop-game-overlay';
             
-            // Đã sửa thành "thua.png" để tìm đúng file trong cùng thư mục với index.html
-            stopDiv.innerHTML = '<img src="thua.png" alt="Thua" class="thua-img" />';
+            // Đổ ảnh đã được chọn ngẫu nhiên và không trùng lặp vào đây
+            stopDiv.innerHTML = `<img src="${selectedImage}" alt="Thua" class="thua-img" />`;
 
             // Thiết lập style trực tiếp bằng JS, bảo đảm đè chuẩn toàn bộ khu vực avatar/bài
             stopDiv.style.position = 'absolute';
@@ -36,7 +66,7 @@
             stopDiv.style.zIndex = '9999';
             stopDiv.style.pointerEvents = 'none'; // Không cản trở các click chuột nếu có
 
-            // Định dạng và cân chỉnh ảnh thua.png cho vừa vặn với khung chứa người chơi
+            // Định dạng và cân chỉnh ảnh cho vừa vặn với khung chứa người chơi
             const imgEl = stopDiv.querySelector('.thua-img');
             if (imgEl) {
                 imgEl.style.width = '85%';      // Tự động chiếm 85% chiều rộng khu vực
