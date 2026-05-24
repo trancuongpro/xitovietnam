@@ -584,8 +584,8 @@ body{
 
 .btn-bet{
 
-    width:23px;
-    height:23px;
+    width:35px;
+    height:35px;
 
     border:none;
 
@@ -625,9 +625,9 @@ body{
 
     color:white;
 
-    padding:4px 10px;
+    padding:8px 18px;
 
-    font-size:10px;
+    font-size:14px;
 
     margin-left:50px;
 }
@@ -787,7 +787,7 @@ body{
 
     position:absolute;
 
-    bottom:215px;
+    bottom:240px;
 
     left:50%;
 
