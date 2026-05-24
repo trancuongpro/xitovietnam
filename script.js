@@ -52,7 +52,7 @@ function init() {
             bgMusic.play();
             isMusicPlaying = true;
             musicStarted = true;
-            soundToggle.textContent = '🔊 Nhạc';
+            soundToggle.textContent = '🔊 Nhạc Nền';
         }
     },{once:true});
 }
@@ -327,17 +327,22 @@ function nextFollowTurn() {
         );
 
         if (
-            gameState.activePlayers.length <= 1
-        ) {
+    gameState.activePlayers.length <= 1
+) {
 
-            thongBao.hienThongBao(
-                "Ồ Ai Cũng Bỏ Hết Vậy Ha Ha Ha Lụm Lúa Thôi Nè"
-            );
+    thongBao.hienThongBao(
+        "Ồ Ai Cũng Bỏ Hết Vậy Ha Ha Ha Lụm Lúa Thôi Nè"
+    );
 
-            endGameAndCompare();
+    
+        setTimeout(() => {
 
-            return;
-        }
+    endGameAndCompare();
+
+}, 2000);
+
+        return;
+}
 
         // CHƯA TỚI LÁ THỨ 5
         if (gameState.currentRound < 3) {
